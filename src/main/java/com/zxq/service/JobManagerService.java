@@ -25,7 +25,8 @@ import javax.annotation.Resource;
  **/
 @Slf4j
 @Service
-public class JobManagerService {
+public class JobManagerService
+{
 
     /**
      * JobInfoMapper
@@ -41,19 +42,25 @@ public class JobManagerService {
 
     /**
      * 判断是否需要创建新的任务分组
+     *
      * @param jobInfoBO
      * @return
      */
-    private String checkCreateJobGroup(JobInfoBO jobInfoBO) {
-        if (jobInfoBO.getJobGroupId() == null && StrUtil.isNotBlank(jobInfoBO.getJobGroupName())) {
+    private String checkCreateJobGroup(JobInfoBO jobInfoBO)
+    {
+        if (jobInfoBO.getJobGroupId() == null && StrUtil.isNotBlank(jobInfoBO.getJobGroupName()))
+        {
             JobGroup findOne = new JobGroup();
             findOne.setName(jobInfoBO.getJobGroupName());
             int count = jobGroupMapper.selectCount(findOne);
-            if (count == 0) {
+            if (count == 0)
+            {
                 findOne.setCreateTime(DateUtil.date());
                 jobGroupMapper.insertSelective(findOne);
                 jobInfoBO.setJobGroupId(findOne.getId());
-            } else {
+            }
+            else
+            {
                 return "该分组名已存在";
             }
         }
@@ -62,21 +69,25 @@ public class JobManagerService {
 
     /**
      * 添加一个任务,并开启执行
+     *
      * @param jobInfoBO
      * @return
      */
     @Transactional(rollbackFor = RuntimeException.class)
-    public String addJob(Scheduler scheduler, JobInfoBO jobInfoBO) {
+    public String addJob(Scheduler scheduler, JobInfoBO jobInfoBO)
+    {
         // 1.判断是否需要生成新的任务分组
         String checkRes = checkCreateJobGroup(jobInfoBO);
-        if (!JobConstant.SUCCESS_CODE.equals(checkRes)) {
+        if (!JobConstant.SUCCESS_CODE.equals(checkRes))
+        {
             return checkRes;
         }
         // 2.新增jonInfo
         JobInfo checkJobTitle = new JobInfo();
         checkJobTitle.setTitle(jobInfoBO.getTitle());
         int count = jobInfoMapper.selectCount(checkJobTitle);
-        if (count > 0) {
+        if (count > 0)
+        {
             return "该任务名称已被占用";
         }
         jobInfoBO.setStatus(JobEnums.JobStatus.RUNNING.status());
@@ -93,14 +104,18 @@ public class JobManagerService {
                 // withMisfireHandlingInstructionDoNothing ：服务重启后不会执行已过期的任务，只会执行下一周期的任务
                 .withSchedule(CronScheduleBuilder.cronSchedule(jobInfoBO.getCron()).withMisfireHandlingInstructionDoNothing())
                 .build();
-        try {
+        try
+        {
             scheduler.scheduleJob(jobDetail, trigger);
             // 判断调度器是否执行
-            if (!scheduler.isStarted()) {
+            if (!scheduler.isStarted())
+            {
                 scheduler.start();
             }
             return JobConstant.SUCCESS_CODE;
-        } catch (SchedulerException e) {
+        }
+        catch (SchedulerException e)
+        {
             log.error("JobManagerService addJob scheduleJob occur exception : {}", e);
             // 手动回滚事务
             throw new RuntimeException(e);
@@ -109,42 +124,58 @@ public class JobManagerService {
 
     /**
      * 暂停、删除、恢复任务
+     *
      * @param scheduler
      * @param jobInfoId
      * @return
      */
-    public String pauseOrRemoveOrRestoreJob(Scheduler scheduler, Integer jobInfoId, Integer status) {
+    public String pauseOrRemoveOrRestoreJob(Scheduler scheduler, Integer jobInfoId, Integer status)
+    {
         JobInfo jobInfo = jobInfoMapper.selectByPrimaryKey(jobInfoId);
-        if (jobInfo == null || JobUtil.isDeletedJob(jobInfo)) {
+        if (jobInfo == null || JobUtil.isDeletedJob(jobInfo))
+        {
             return "no http job matched";
         }
         JobKey jobKey = JobUtil.getJobKey(jobInfo);
         TriggerKey triggerKey = JobUtil.getTriggerKey(jobInfo);
-        try {
-            if (status.equals(JobEnums.JobStatus.PAUSING.status())) {
-                if (status.equals(jobInfo.getStatus())) {
+        try
+        {
+            if (status.equals(JobEnums.JobStatus.PAUSING.status()))
+            {
+                if (status.equals(jobInfo.getStatus()))
+                {
                     return "该任务为停止状态,不可重复操作";
                 }
                 // 暂停调度任务
-                if (!JobUtil.isPaused(scheduler, triggerKey)) {
+                if (!JobUtil.isPaused(scheduler, triggerKey))
+                {
                     scheduler.pauseJob(jobKey);
                 }
-            } else if (status.equals(JobEnums.JobStatus.DELETED.status())) {
+            }
+            else if (status.equals(JobEnums.JobStatus.DELETED.status()))
+            {
                 // 暂停调度任务
-                if (!JobUtil.isPaused(scheduler, triggerKey)) {
+                if (!JobUtil.isPaused(scheduler, triggerKey))
+                {
                     scheduler.pauseJob(jobKey);
                 }
                 // 删除调度任务
                 scheduler.deleteJob(jobKey);
-            } else if (status.equals(JobEnums.JobStatus.RUNNING.status())) {
-                if (status.equals(jobInfo.getStatus())) {
+            }
+            else if (status.equals(JobEnums.JobStatus.RUNNING.status()))
+            {
+                if (status.equals(jobInfo.getStatus()))
+                {
                     return "该任务为运行状态,不可重复操作";
                 }
                 // 恢复一个任务
-                if (!JobUtil.isNormal(scheduler, triggerKey)) {
+                if (!JobUtil.isNormal(scheduler, triggerKey))
+                {
                     scheduler.resumeJob(jobKey);
                 }
-            } else {
+            }
+            else
+            {
                 return "not support status";
             }
             // 更新jobInfo执行状态
@@ -153,7 +184,9 @@ public class JobManagerService {
             update.setStatus(status);
             jobInfoMapper.updateByPrimaryKeySelective(update);
             return JobConstant.SUCCESS_CODE;
-        } catch (SchedulerException e) {
+        }
+        catch (SchedulerException e)
+        {
             log.error("jobInfoId = {} pauseOrRemoveOrRestoreJob error : {}", jobInfoId, e);
             return e.getMessage();
         }
@@ -161,24 +194,31 @@ public class JobManagerService {
 
     /**
      * 立即执行任务
+     *
      * @param scheduler
      * @param jobInfoId
      * @return
      */
-    public String executeJob(Scheduler scheduler, Integer jobInfoId) {
+    public String executeJob(Scheduler scheduler, Integer jobInfoId)
+    {
         JobInfo jobInfo = jobInfoMapper.selectByPrimaryKey(jobInfoId);
-        if (jobInfo == null || JobUtil.isDeletedJob(jobInfo)) {
+        if (jobInfo == null || JobUtil.isDeletedJob(jobInfo))
+        {
             return "no http job matched";
         }
         JobKey jobKey = JobUtil.getJobKey(jobInfo);
         TriggerKey triggerKey = JobUtil.getTriggerKey(jobInfo);
-        try {
-            if (JobUtil.isPaused(scheduler, triggerKey)) {
+        try
+        {
+            if (JobUtil.isPaused(scheduler, triggerKey))
+            {
                 return "该任务为停止状态,无法立即运行";
             }
             scheduler.triggerJob(jobKey);
             return JobConstant.SUCCESS_CODE;
-        } catch (SchedulerException e) {
+        }
+        catch (SchedulerException e)
+        {
             log.error("jobInfoId = {} executeJob error : {}", jobInfoId, e);
             return e.getMessage();
         }
@@ -186,27 +226,33 @@ public class JobManagerService {
 
     /**
      * 修改任务
-     *    每次编辑，都是新增一个调度任务替换旧的调度任务
+     * 每次编辑，都是新增一个调度任务替换旧的调度任务
+     *
      * @param scheduler
      * @param jobInfoBO
      * @return
      */
     @Transactional(rollbackFor = RuntimeException.class)
-    public String editJob(Scheduler scheduler, JobInfoBO jobInfoBO) {
+    public String editJob(Scheduler scheduler, JobInfoBO jobInfoBO)
+    {
         JobInfo jobInfoInDB = jobInfoMapper.selectByPrimaryKey(jobInfoBO.getId());
-        if (jobInfoInDB == null) {
+        if (jobInfoInDB == null)
+        {
             return "无法匹配指定任务";
         }
-        if (JobUtil.isDeletedJob(jobInfoInDB)) {
+        if (JobUtil.isDeletedJob(jobInfoInDB))
+        {
             return "无法编辑已删除的任务";
         }
         // 判断是否需要生成新的任务分组
         String checkRes = checkCreateJobGroup(jobInfoBO);
-        if (!JobConstant.SUCCESS_CODE.equals(checkRes)) {
+        if (!JobConstant.SUCCESS_CODE.equals(checkRes))
+        {
             return checkRes;
         }
         jobInfoMapper.updateByPrimaryKeySelective(jobInfoBO);
-        try {
+        try
+        {
             JobKey jobKey = JobUtil.getJobKey(jobInfoBO);
             // 删除旧任务
             scheduler.deleteJob(jobKey);
@@ -218,10 +264,13 @@ public class JobManagerService {
                     .build();
             scheduler.scheduleJob(jobDetail, trigger);
             // 原任务为暂停状态，新增任务状态要与原来保持一致
-            if (JobEnums.JobStatus.PAUSING.status().equals(jobInfoInDB.getStatus())) {
+            if (JobEnums.JobStatus.PAUSING.status().equals(jobInfoInDB.getStatus()))
+            {
                 scheduler.pauseJob(jobKey);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             log.error("jobInfoId = {} editJob error : {}", jobInfoInDB.getId(), e);
             // 手动回滚事务
             throw new RuntimeException(e);

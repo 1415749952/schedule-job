@@ -11,12 +11,13 @@ import java.util.Date;
  */
 @Table(name = "schedule_job_log")
 @Data
-public class JobLog {
+public class JobLog
+{
     /**
      * 主键
      */
     @Id
-    @GeneratedValue(generator="JDBC")
+    @GeneratedValue(generator = "JDBC")
     private Integer id;
 
     /**

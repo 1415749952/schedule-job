@@ -11,10 +11,12 @@ import java.util.List;
 /**
  * @author zxq
  */
-public interface JobLogMapper extends Mapper<JobLog> {
+public interface JobLogMapper extends Mapper<JobLog>
+{
 
     /**
      * 查找任务运行日志
+     *
      * @param jobLogQuery
      * @return
      */

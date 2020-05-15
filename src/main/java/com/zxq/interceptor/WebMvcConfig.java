@@ -14,14 +14,16 @@ import java.util.List;
  * @date 2020/4/16 15:33
  **/
 @Configuration
-public class WebMvcConfig implements WebMvcConfigurer {
+public class WebMvcConfig implements WebMvcConfigurer
+{
 
     @Autowired
     private LoginInterceptor loginInterceptor;
 
     private final static List<String> EXCLUDE_PATH = new ArrayList<>();
 
-    static {
+    static
+    {
         // 静态资源
         EXCLUDE_PATH.add("/css/**");
         EXCLUDE_PATH.add("/fonts/**");
@@ -35,7 +37,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     @Override
-    public void addInterceptors(InterceptorRegistry registry) {
+    public void addInterceptors(InterceptorRegistry registry)
+    {
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns(EXCLUDE_PATH);
@@ -43,10 +46,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     /**
      * 允许跨域携带cookie
+     *
      * @param registry
      */
     @Override
-    public void addCorsMappings(CorsRegistry registry) {
+    public void addCorsMappings(CorsRegistry registry)
+    {
         registry.addMapping("/**")
                 .allowedOrigins("*")
                 .allowedMethods("*")

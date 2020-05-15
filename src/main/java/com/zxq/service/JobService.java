@@ -30,7 +30,8 @@ import java.util.*;
  **/
 @Slf4j
 @Service
-public class JobService {
+public class JobService
+{
 
     /**
      * 任务 dao
@@ -58,38 +59,45 @@ public class JobService {
 
     /**
      * 查询http任务列表
+     *
      * @param jobInfoQuery
      * @return
      */
-    public PageVO<JobInfoBO> selectJob(JobInfoQuery jobInfoQuery) {
+    public PageVO<JobInfoBO> selectJob(JobInfoQuery jobInfoQuery)
+    {
         PageVO<JobInfoBO> page = new PageVO<>();
         PageHelperUtil.startPage(jobInfoQuery.getPage(), jobInfoQuery.getLimit());
         List<JobInfoBO> jobInfoBOs = jobInfoMapper.selectJobInfo(jobInfoQuery);
         PageInfo<JobInfoBO> pageInfo = new PageInfo<>(jobInfoBOs);
-        if (pageInfo != null && pageInfo.getTotal() > 0) {
+        if (pageInfo != null && pageInfo.getTotal() > 0)
+        {
             // 遍历设置下一次运行时间
-            jobInfoBOs.forEach(bo -> {
+            jobInfoBOs.forEach(bo ->
+            {
                 bo.setNextExecuteTime(JobUtil.getNextExecuteTime(bo));
             });
             page.setList(jobInfoBOs);
-            page.setTotal((int)pageInfo.getTotal());
+            page.setTotal((int) pageInfo.getTotal());
         }
         return page;
     }
 
     /**
      * 查询指定任务的日志
+     *
      * @param jobLogQuery
      * @return
      */
-    public PageVO<JobLogBO> selectJobLog(JobLogQuery jobLogQuery) {
+    public PageVO<JobLogBO> selectJobLog(JobLogQuery jobLogQuery)
+    {
         PageVO<JobLogBO> page = new PageVO<>();
         PageHelperUtil.startPage(jobLogQuery.getPage(), jobLogQuery.getLimit());
         List<JobLogBO> jobLogs = jobLogMapper.selectJobLog(jobLogQuery);
         PageInfo<JobLogBO> pageInfo = new PageInfo<>(jobLogs);
-        if (pageInfo != null && pageInfo.getTotal() > 0) {
+        if (pageInfo != null && pageInfo.getTotal() > 0)
+        {
             page.setList(jobLogs);
-            page.setTotal((int)pageInfo.getTotal());
+            page.setTotal((int) pageInfo.getTotal());
         }
 
         return page;
@@ -97,9 +105,11 @@ public class JobService {
 
     /**
      * 获取数据库中已有任务分组
+     *
      * @return
      */
-    public List<JobGroup> selectJobGroup() {
+    public List<JobGroup> selectJobGroup()
+    {
         Example example = new Example(JobGroup.class);
         example.setOrderByClause("create_time desc");
         return jobGroupMapper.selectByExample(example);
@@ -107,9 +117,11 @@ public class JobService {
 
     /**
      * 获取任务数统计
+     *
      * @return
      */
-    public Map<String,Integer> getJobInfoAmountStatistic() {
+    public Map<String, Integer> getJobInfoAmountStatistic()
+    {
         HashMap<String, Integer> res = new HashMap<>(4);
         JobInfo search = new JobInfo();
         // 总任务数
@@ -136,11 +148,13 @@ public class JobService {
 
     /**
      * 查询指定时间范围内的任务执行数据报表
+     *
      * @param startDate
      * @param endDate
      * @return
      */
-    public Map<String, Object> getReportStatistic(Date startDate, Date endDate) {
+    public Map<String, Object> getReportStatistic(Date startDate, Date endDate)
+    {
         // 折线图x轴数据
         List<String> line_x = new ArrayList<>();
         // 折线图-执行中-y轴数据
@@ -159,15 +173,18 @@ public class JobService {
         example.setOrderByClause("day");
         example.createCriteria().andBetween("day", startDate, endDate);
         List<JobLogReport> reports = jobLogReportMapper.selectByExample(example);
-        while (DateUtil.compare(startDate, endDate) < 0) {
+        while (DateUtil.compare(startDate, endDate) < 0)
+        {
             line_x.add(DateUtil.formatDate(startDate));
             int runningCount = 0;
             int successCount = 0;
             int failCount = 0;
-            if (reports != null) {
+            if (reports != null)
+            {
                 final Date compareDate = startDate;
                 Optional<JobLogReport> first = reports.stream().filter(v -> DateUtil.compare(v.getDay(), compareDate) == 0).findFirst();
-                if (first.isPresent()) {
+                if (first.isPresent())
+                {
                     JobLogReport findInDB = first.get();
                     runningCount = findInDB.getRunningCount();
                     successCount = findInDB.getSuccessCount();
@@ -202,9 +219,11 @@ public class JobService {
 
     /**
      * 根据id查找指定任务
+     *
      * @param jobInfoId
      */
-    public JobInfo selectJobInfoById(Integer jobInfoId) {
+    public JobInfo selectJobInfoById(Integer jobInfoId)
+    {
         return jobInfoMapper.selectByPrimaryKey(jobInfoId);
     }
 }

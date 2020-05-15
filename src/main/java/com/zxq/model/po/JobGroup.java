@@ -10,13 +10,15 @@ import java.util.Date;
  */
 @Table(name = "schedule_job_group")
 @Data
-public class JobGroup {
+public class JobGroup
+{
     /**
      * 主键
+     *
      * @GeneratedValue insert操作后会把主键id映射到实体id上
      */
     @Id
-    @GeneratedValue(generator="JDBC")
+    @GeneratedValue(generator = "JDBC")
     private Integer id;
 
     /**

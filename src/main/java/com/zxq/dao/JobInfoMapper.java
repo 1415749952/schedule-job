@@ -11,10 +11,12 @@ import java.util.List;
 /**
  * @author zxq
  */
-public interface JobInfoMapper extends Mapper<JobInfo> {
+public interface JobInfoMapper extends Mapper<JobInfo>
+{
 
     /**
      * 查询jobInfo
+     *
      * @param query
      * @return
      */

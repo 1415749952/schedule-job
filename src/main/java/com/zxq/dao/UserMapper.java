@@ -7,5 +7,6 @@ import tk.mybatis.mapper.common.Mapper;
 /**
  * @author zxq
  */
-public interface UserMapper extends Mapper<User> {
+public interface UserMapper extends Mapper<User>
+{
 }

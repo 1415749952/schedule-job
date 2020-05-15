@@ -8,7 +8,8 @@ import lombok.Data;
  * @date 2020/3/25 14:29
  **/
 @Data
-public class JobInfoQuery extends PageVO {
+public class JobInfoQuery extends PageVO
+{
 
     /**
      * http任务标题

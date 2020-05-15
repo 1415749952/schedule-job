@@ -2,10 +2,12 @@ package com.zxq.constant;
 
 /**
  * job相关的常量
+ *
  * @author zxq
  * @date 2020/3/24 15:48
  **/
-public class JobConstant {
+public class JobConstant
+{
 
     /**
      * job key 前缀

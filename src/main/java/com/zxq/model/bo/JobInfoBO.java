@@ -11,7 +11,8 @@ import java.util.Date;
  * @date 2020/3/25 17:46
  **/
 @Data
-public class JobInfoBO extends JobInfo {
+public class JobInfoBO extends JobInfo
+{
 
     /**
      * 分组名

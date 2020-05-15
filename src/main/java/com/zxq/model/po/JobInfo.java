@@ -13,12 +13,13 @@ import java.util.Date;
  */
 @Table(name = "schedule_job_info")
 @Data
-public class JobInfo {
+public class JobInfo
+{
     /**
      * 主键
      */
     @Id
-    @GeneratedValue(generator="JDBC")
+    @GeneratedValue(generator = "JDBC")
     private Integer id;
 
     /**

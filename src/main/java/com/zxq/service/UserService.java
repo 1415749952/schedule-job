@@ -24,7 +24,8 @@ import java.util.List;
  **/
 @Service
 @Slf4j
-public class UserService {
+public class UserService
+{
 
     /**
      * UserMapper
@@ -34,12 +35,15 @@ public class UserService {
 
     /**
      * 用户名、密码校验
+     *
      * @param username
      * @param password
      * @return
      */
-    public User auth(String username, String password) {
-        if (StrUtil.isNotBlank(username) && StrUtil.isNotBlank(password)) {
+    public User auth(String username, String password)
+    {
+        if (StrUtil.isNotBlank(username) && StrUtil.isNotBlank(password))
+        {
             String sign = StrUtil.concat(false, username, password);
             String pwd = SecureUtil.md5(sign);
             User query = new User();
@@ -52,18 +56,22 @@ public class UserService {
 
     /**
      * 修改密码
+     *
      * @param oldPwd
      * @param newPwd
      * @return
      */
-    public String editPwd(String oldPwd, String newPwd) {
+    public String editPwd(String oldPwd, String newPwd)
+    {
         User userInfo = SessionUtil.getUserInfo();
         String oldSign = StrUtil.concat(false, userInfo.getUsername(), oldPwd);
         String oldPassword = SecureUtil.md5(oldSign);
-        if (!userInfo.getPassword().equals(oldPassword)) {
+        if (!userInfo.getPassword().equals(oldPassword))
+        {
             return "原始密码不正确";
         }
-        if (oldPwd.equals(newPwd)) {
+        if (oldPwd.equals(newPwd))
+        {
             return "新密码不能与原始密码一致";
         }
         String newSign = StrUtil.concat(false, userInfo.getUsername(), newPwd);
@@ -77,39 +85,49 @@ public class UserService {
 
     /**
      * 分页获取用户列表
+     *
      * @param userQuery
      * @return
      */
-    public PageVO<User> selectUser(UserQuery userQuery) {
+    public PageVO<User> selectUser(UserQuery userQuery)
+    {
         PageVO<User> page = new PageVO<>();
         Example example = new Example(User.class);
-        if (userQuery != null && StrUtil.isNotBlank(userQuery.getUsername())) {
+        if (userQuery != null && StrUtil.isNotBlank(userQuery.getUsername()))
+        {
             example.createCriteria().andLike("username", "%" + userQuery.getUsername() + "%");
         }
         PageHelperUtil.startPage(userQuery.getPage(), userQuery.getLimit());
         List<User> users = userMapper.selectByExample(example);
         PageInfo<User> pageInfo = new PageInfo<>(users);
-        if (pageInfo != null && pageInfo.getTotal() > 0) {
+        if (pageInfo != null && pageInfo.getTotal() > 0)
+        {
             page.setList(users);
-            page.setTotal((int)pageInfo.getTotal());
+            page.setTotal((int) pageInfo.getTotal());
         }
         return page;
     }
 
     /**
      * 删除用户
+     *
      * @param userId
      * @return
      */
-    public String deleteUser(Integer userId) {
+    public String deleteUser(Integer userId)
+    {
         User userInfo = SessionUtil.getUserInfo();
-        if (!SessionUtil.isSuperUser()) {
+        if (!SessionUtil.isSuperUser())
+        {
             return "权限不足";
-        } else if (userInfo.getId().equals(userId)) {
+        }
+        else if (userInfo.getId().equals(userId))
+        {
             return "无法删除自己";
         }
         User userInDB = userMapper.selectByPrimaryKey(userId);
-        if (userInDB == null) {
+        if (userInDB == null)
+        {
             return "删除用户不存在";
         }
         userMapper.deleteByPrimaryKey(userId);
@@ -118,17 +136,21 @@ public class UserService {
 
     /**
      * 新增用户
+     *
      * @param user
      * @return
      */
-    public String insertUser(User user) {
-        if (!SessionUtil.isSuperUser()) {
+    public String insertUser(User user)
+    {
+        if (!SessionUtil.isSuperUser())
+        {
             return "权限不足";
         }
         User query = new User();
         query.setUsername(user.getUsername());
         int count = userMapper.selectCount(query);
-        if (count > 0) {
+        if (count > 0)
+        {
             return "该用户名已被占用";
         }
         // 密码加密

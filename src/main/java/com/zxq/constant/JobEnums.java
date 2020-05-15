@@ -2,12 +2,15 @@ package com.zxq.constant;
 
 /**
  * job 相关枚举值
+ *
  * @author zxq
  * @date 2020/3/24 17:04
  **/
-public class JobEnums {
+public class JobEnums
+{
 
-    public enum JobStatus {
+    public enum JobStatus
+    {
 
         /**
          * 已暂停
@@ -32,23 +35,27 @@ public class JobEnums {
          */
         private String value;
 
-        JobStatus(Integer status, String value) {
+        JobStatus(Integer status, String value)
+        {
             this.status = status;
             this.value = value;
         }
 
-        public Integer status() {
+        public Integer status()
+        {
             return this.status;
         }
 
-        public String value() {
+        public String value()
+        {
             return this.value;
         }
 
 
     }
 
-    public enum JobLogStatus {
+    public enum JobLogStatus
+    {
 
         /**
          * 已暂停
@@ -69,16 +76,19 @@ public class JobEnums {
          */
         private String value;
 
-        JobLogStatus(Integer status, String value) {
+        JobLogStatus(Integer status, String value)
+        {
             this.status = status;
             this.value = value;
         }
 
-        public Integer status() {
+        public Integer status()
+        {
             return this.status;
         }
 
-        public String value() {
+        public String value()
+        {
             return this.value;
         }
 

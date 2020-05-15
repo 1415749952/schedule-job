@@ -6,5 +6,6 @@ import tk.mybatis.mapper.common.Mapper;
 /**
  * @author zxq
  */
-public interface JobGroupMapper extends Mapper<JobGroup> {
+public interface JobGroupMapper extends Mapper<JobGroup>
+{
 }

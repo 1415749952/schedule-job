@@ -8,7 +8,8 @@ import lombok.Data;
  * @date 2020/3/25 17:46
  **/
 @Data
-public class JobLogBO extends JobLog {
+public class JobLogBO extends JobLog
+{
 
     /**
      * 分组名

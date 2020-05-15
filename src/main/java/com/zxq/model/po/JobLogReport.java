@@ -10,13 +10,15 @@ import java.util.Date;
 
 /**
  * 任务日志报表实体
+ *
  * @author zxq
  */
 @Table(name = "schedule_job_log_report")
 @Data
-public class JobLogReport {
+public class JobLogReport
+{
     @Id
-    @GeneratedValue(generator="JDBC")
+    @GeneratedValue(generator = "JDBC")
     private Integer id;
 
     /**

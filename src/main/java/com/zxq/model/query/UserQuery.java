@@ -8,7 +8,8 @@ import lombok.Data;
  * @date 2020/3/25 16:10
  **/
 @Data
-public class UserQuery extends PageVO {
+public class UserQuery extends PageVO
+{
 
     /**
      * 用户名

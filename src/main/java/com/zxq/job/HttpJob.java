@@ -24,14 +24,15 @@ import java.util.Date;
 
 /**
  * htt任务处理类
+ *
  * @author zxq
  * @date 2020/3/23 15:42
- *
  * @DisallowConcurrentExecution 禁止并发执行多个相同定义的JobDetail
  **/
 @Slf4j
 @DisallowConcurrentExecution
-public class HttpJob extends QuartzJobBean {
+public class HttpJob extends QuartzJobBean
+{
 
     /**
      * 任务日志Mapper
@@ -46,7 +47,8 @@ public class HttpJob extends QuartzJobBean {
     private JobLogReportMapper jobLogReportMapper;
 
     @Override
-    protected void executeInternal(JobExecutionContext jobExecutionContext) {
+    protected void executeInternal(JobExecutionContext jobExecutionContext)
+    {
         // 开启计时器
         TimeInterval timer = DateUtil.timer();
 
@@ -65,12 +67,15 @@ public class HttpJob extends QuartzJobBean {
         JobInfo jobInfo = JSONUtil.toBean(data, JobInfo.class);
 
         // 执行http请求
-        try {
+        try
+        {
             String executeResult = sendHttpRequest(jobInfo);
             jobLog.setExecuteStatus(JobEnums.JobLogStatus.SUCCESS.status());
             jobLogReportMapper.increaseSuccessCount(reportId);
             log.info("HttpJob title = {} execute success, HttpResponse : {}", jobInfo.getTitle(), executeResult);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // http请求失败
             jobLog.setExecuteStatus(JobEnums.JobLogStatus.FAILURE.status());
             jobLog.setExecuteFailMsg(e.getMessage());
@@ -88,14 +93,17 @@ public class HttpJob extends QuartzJobBean {
 
     /**
      * 获取当天的任务日志报表id
+     *
      * @param day
      * @return
      */
-    private int getJobLogReportByDay(Date day) {
+    private int getJobLogReportByDay(Date day)
+    {
         JobLogReport search = new JobLogReport();
         search.setDay(day);
         JobLogReport jobLogReport = jobLogReportMapper.selectOne(search);
-        if (jobLogReport == null) {
+        if (jobLogReport == null)
+        {
             jobLogReportMapper.insertSelective(search);
             return search.getId();
         }
@@ -104,27 +112,38 @@ public class HttpJob extends QuartzJobBean {
 
     /**
      * 根据jobInfo发送http请求
+     *
      * @param jobInfo
      * @return
      */
-    private String sendHttpRequest(JobInfo jobInfo) {
+    private String sendHttpRequest(JobInfo jobInfo)
+    {
         String response = null;
         String url = jobInfo.getUrl();
         String method = jobInfo.getMethod();
         String params = jobInfo.getParams();
         log.info("url = {}, method = {}, params = {}", url, method, params);
-        if (method.toUpperCase().equals(HttpMethod.GET.name())) {
+        if (method.toUpperCase().equals(HttpMethod.GET.name()))
+        {
             // get 请求
-            if (StrUtil.isNotBlank(params)) {
+            if (StrUtil.isNotBlank(params))
+            {
                 response = HttpUtil.get(url, JSONUtil.parseObj(params));
-            } else {
+            }
+            else
+            {
                 response = HttpUtil.get(url);
             }
-        } else if (method.toUpperCase().equals(HttpMethod.POST.name())) {
+        }
+        else if (method.toUpperCase().equals(HttpMethod.POST.name()))
+        {
             // post 请求
-            if (StrUtil.isNotBlank(params)) {
+            if (StrUtil.isNotBlank(params))
+            {
                 response = HttpUtil.post(url, JSONUtil.parseObj(params));
-            } else {
+            }
+            else
+            {
                 response = HttpUtil.post(url, "");
             }
         }
